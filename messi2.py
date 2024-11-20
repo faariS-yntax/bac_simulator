@@ -148,7 +148,7 @@ def calculate_mae(actual_times, actual_values, forecast_times, forecast_values):
     forecast_at_actual_times = forecast_interp_func(actual_times)
     
     # Calculate percentage errors, handling potential zero division
-    errors = np.abs(actual_values - forecast_at_actual_times)*100
+    errors = np.abs(actual_values - forecast_at_actual_times)
     
     # Calculate mean percentage error
     mae = np.mean(errors)
@@ -233,7 +233,7 @@ def main():
     
     gender = st.sidebar.radio("Select Gender", options=['male', 'female'])
     stomach_level = st.sidebar.radio("Select stomach level", options=['full', 'empty'])
-    body_weight_kg = st.sidebar.slider("Body Weight (kg)", min_value=40, max_value=150, value=70)
+    body_weight_kg = st.sidebar.slider("Body Weight (kg)", min_value=40, max_value=150, value=80)
     
     # Add time span selection
     #time_span = st.sidebar.slider("Simulation Time (hours)", min_value=6, max_value=60, value=24)
@@ -292,8 +292,8 @@ def main():
     for col in [1, 2]:
         fig.add_hline(y=0.8, line_dash="dash", line_color="yellow", 
                      row=1, col=col, annotation_text="Legal Limit (0.8)")
-        fig.add_hline(y=2.0, line_dash="dash", line_color="red", 
-                     row=1, col=col, annotation_text="Fatal Limit (2.0)")
+        fig.add_hline(y=4.0, line_dash="dash", line_color="red", 
+                     row=1, col=col, annotation_text="Fatal Limit (4.0)")
     
     fig.update_layout(height=600, showlegend=True)
     fig.update_xaxes(title_text="Time (hours)")
@@ -312,7 +312,7 @@ def main():
     bac_diff = ((max_bac_two_phase - max_bac_pieters) / max_bac_pieters) * 100
     peak_time_diff = ((time_to_peak_two_phase - time_to_peak_pieters) / time_to_peak_pieters) * 100
     
-    st.metric("Model Accuracy / Mean Absolute Error (MAE)", f"{mape:.2f}%")
+    st.metric("Model Accuracy / Mean Absolute Error (MAE)", f"{mape:.2f} g/L")
     
     # Display metrics in columns
     col1, col2 = st.columns(2)
