@@ -71,9 +71,10 @@ def simulate_bac_pieters(gender, time_span=24, num_points=51,
     
     return t, solution, C0, volume_distribution_L
 
-def two_phase_model(num_glasses, glass_volume_ml, abv, body_weight_kg, time_span):
+def two_phase_model(num_glasses, glass_volume_ml, abv, body_weight_kg, stomach_level, gender, time_span):
     # Constants
-    k_abs = 0.174  # Absorption rate constant (per hour)
+    k_abs = 0.173 if stomach_level == 'full' else 0.693  # Absorption rate constant (per hour)
+    r = 0.7 if gender == 'male' else 0.6 # The volumeof distribution (Vd) of ethanol
     Cl_std = 0.24  # Standard clearance rate in L/h
     Vd = 62.5  # Volume of distribution constant in L
 
@@ -109,7 +110,7 @@ def two_phase_model(num_glasses, glass_volume_ml, abv, body_weight_kg, time_span
     # Excretion Phase - Calculate BAC
     counter = 0
     for GI in GI_vals[1:]:
-        BAC = (1 - k_exc ) * BAC_vals[-1] + (k_abs *  GI) / (body_weight_kg *0.7)
+        BAC = (1 - k_exc ) * BAC_vals[-1] + (k_abs *  GI) / (body_weight_kg * r)
         BAC_vals.append(BAC)
         counter += 1
         #st.write(f"counter {counter}, bac {BAC}")
@@ -230,7 +231,8 @@ def main():
     total_alcohol_ml = num_glasses * glass_volume_ml * (abv/100)
     st.sidebar.markdown(f"Total Pure Alcohol: **{total_alcohol_ml:.1f} mL**")
     
-    gender = st.sidebar.radio("Select Gender (Pieter's Model)", options=['male', 'female'])
+    gender = st.sidebar.radio("Select Gender", options=['male', 'female'])
+    stomach_level = st.sidebar.radio("Select stomach level", options=['full', 'empty'])
     body_weight_kg = st.sidebar.slider("Body Weight (kg)", min_value=40, max_value=150, value=70)
     
     # Add time span selection
@@ -255,7 +257,7 @@ def main():
     )
     
     t_two_phase, bac_two_phase = two_phase_model(
-        num_glasses, glass_volume_ml, abv, body_weight_kg, time_span=time_span
+        num_glasses, glass_volume_ml, abv, body_weight_kg, stomach_level, gender, time_span=time_span
     )
     
     # After model simulation and before displaying metrics
